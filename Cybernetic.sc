@@ -21,9 +21,9 @@ Cybernetic {
 
 	*initClass {
 		super.initClass;
-		version = "26 February 2014";
-		allowPut = true;
-		allowDo = true;
+		version = "8 October 2015";
+		allowPut = false;
+		allowDo = false;
 		allowCodeShare = true;
 		("Cybernetic.sc: " ++ version).postln;
 
@@ -42,6 +42,16 @@ Cybernetic {
 							msg[1].asString.interpret.value;
 					});
 			},"/cybernetic/do").permanent_(true);
+
+			OSCdef(\pbindef,
+				{ |msg,time,addr,port|
+					if(allowDo,
+						{
+							msg[1].postln;
+							Pbindef(msg[1].asSymbol,msg[2].asSymbol,
+								msg[3].asString.interpret.value);
+					});
+			},"/cybernetic/pbindef").permanent_(true);
 
 			thisProcess.interpreter.codeDump = {
 				|code|
@@ -66,4 +76,8 @@ Cybernetic {
 		Esp.send.sendMsg("/esp/msg/now","/cybernetic/do",code.asCompileString);
 	}
 
+	*pbindef {
+		| key1,key2,value |
+		Esp.send.sendMsg("/esp/msg/now","/cybernetic/pbindef",key1,key2,value.asCompileString);
+	}
 }
