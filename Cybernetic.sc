@@ -25,7 +25,7 @@ Cybernetic {
 
 	*initClass {
 		super.initClass;
-		version = "5 November 2015";
+		version = "26 November 2015";
 		allowPut = false;
 		allowDo = false;
 		allowCodeShare = true;
@@ -58,6 +58,14 @@ Cybernetic {
 						Pbindef(msg[1].asSymbol,msg[2].asSymbol,msg[3].asString.interpret.value);
 					});
 			},"/cybernetic/pbindef").permanent_(true);
+
+			OSCdef(\pdef,
+				{ |msg,time,addr,port|
+					if(allowDo,{
+						("/cybernetic/pdef " ++ msg[1].asString ++ " " ++ msg[2].asString).postln;
+						Pdef(msg[1].asSymbol,msg[2].asString.interpret.value);
+					});
+			},"/cybernetic/pdef").permanent_(true);
 
 			thisProcess.interpreter.codeDump = {
 				|code|
@@ -101,4 +109,14 @@ Cybernetic {
 			Esp.send.sendMsg("/esp/msg/now","/cybernetic/pbindef",key1,key2,value.asCompileString);
 		});
 	}
+
+	*pdef {
+		| key, value |
+		if(directBroadcast,{
+			send.sendMsg("/cybernetic/pdef",key,value.asCompileString);
+		},{
+			Esp.send.sendMsg("/esp/msg/now","/cybernetic/pdef",key,value.asCompileString);
+		});
+	}
+
 }
