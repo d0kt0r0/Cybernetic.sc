@@ -25,10 +25,10 @@ Cybernetic {
 
 	*initClass {
 		super.initClass;
-		version = "26 November 2015";
+		version = "17 April 2017";
 		allowPut = false;
 		allowDo = false;
-		allowCodeShare = true;
+		allowCodeShare = false;
 		directBroadcast = false;
 		NetAddr.broadcastFlag = true;
 		Cybernetic.broadcast_("255.255.255.255"); // also initializes 'send' object
@@ -69,12 +69,26 @@ Cybernetic {
 
 			thisProcess.interpreter.codeDump = {
 				|code|
-				if(allowCodeShare && (directBroadcast==false),
-					{
+				if(allowCodeShare && (directBroadcast==false),{
 						Esp.send.sendMsg("/esp/codeShare/post","SuperCollider",code);
+				});
+				if(allowCodeShare && (directBroadcast==true),{
+						NetAddr.broadcastFlag = true;
+						NetAddr("255.255.255.255",57120).sendMsg("/code",Esp.person,code);
 				});
 			};
 		};
+	}
+
+	*codeLog {
+		OSCdef(\code,{
+			|msg,time,addr,port|
+			var x = "<eval>\n <time>" ++ (Main.elapsedTime.asString) ++ "</time>\n";
+			x = x ++ " <person>" ++ msg[1].asString ++ "</person>\n";
+			x = x ++ " <code>" ++ msg[2].asString ++ "</code>\n</eval>\n";
+			Document.current.string_(x,Document.current.string.size);
+			("code from " ++ msg[1].asString).postln;
+		},"/code");
 	}
 
 	*broadcast_ {
