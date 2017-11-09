@@ -11,9 +11,9 @@ Notes:
 -for this to work, the Esp class must be installed (Esp.sc) and EspGrid must be running
 */
 
-
 Cybernetic {
 
+	classvar utopiaAddrBook,utopiaHail,utopiaCodeRelay;
 	classvar <version;
 	classvar <>allowPut;
 	classvar <>allowDo;
@@ -131,6 +131,20 @@ Cybernetic {
 		},{
 			Esp.send.sendMsg("/esp/msg/now","/cybernetic/pdef",key,value.asCompileString);
 		});
+	}
+
+	*utopia {
+		utopiaAddrBook = AddrBook.new;
+		utopiaAddrBook.addMe(Esp.person);
+		utopiaHail = Hail(utopiaAddrBook);
+        // utopiaChatter = Chatter(utopiaAddrBook);
+		History.start.localOff;
+		utopiaCodeRelay = CodeRelay(utopiaAddrBook);
+        utopiaCodeRelay.addHistory;
+	}
+
+	*utopiaHistory {
+		History.makeWin(20@20);
 	}
 
 }
